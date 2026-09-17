@@ -20,10 +20,12 @@
 
 #include "breezesettingsprovider.h"
 
+#include "breezecompat.h"
 #include "breezeexceptionlist.h"
 
 #include <KWindowInfo>
 
+#include <QRegularExpression>
 #include <QTextStream>
 
 namespace Breeze
@@ -75,7 +77,7 @@ namespace Breeze
         QString className;
 
         // get the client
-        auto client = decoration->client().data();
+        auto client = decorationClient(decoration);
 
         foreach( auto internalSettings, m_exceptions )
         {
@@ -127,7 +129,7 @@ namespace Breeze
             }
 
             // check matching
-            if( QRegExp( internalSettings->exceptionPattern() ).indexIn( value ) >= 0 )
+            if( QRegularExpression( internalSettings->exceptionPattern() ).match( value ).hasMatch() )
             { return internalSettings; }
 
         }

@@ -21,6 +21,7 @@
 
 #include "breezedecoration.h"
 
+#include "breezecompat.h"
 #include "breeze.h"
 #include "breezesettingsprovider.h"
 #include "config-breeze.h"
@@ -188,7 +189,7 @@ namespace Breeze
     QColor Decoration::titleBarColor() const
     {
 
-        auto c = client().data();
+        auto c = decorationClient(this);
         if( hideTitleBar() ) return c->color( ColorGroup::Inactive, ColorRole::TitleBar );
         else if( m_animation->state() == QPropertyAnimation::Running )
         {
@@ -204,7 +205,7 @@ namespace Breeze
     QColor Decoration::fontColor() const
     {
 
-        auto c = client().data();
+        auto c = decorationClient(this);
         if( m_animation->state() == QPropertyAnimation::Running )
         {
             return KColorUtils::mix(
@@ -218,7 +219,7 @@ namespace Breeze
     //________________________________________________________________
     void Decoration::init()
     {
-        auto c = client().data();
+        auto c = decorationClient(this);
 
         // active state change animation
         m_animation->setStartValue( 0 );
@@ -276,7 +277,7 @@ namespace Breeze
     void Decoration::updateTitleBar()
     {
         auto s = settings();
-        auto c = client().data();
+        auto c = decorationClient(this);
         const bool maximized = isMaximized();
         const int width =  c->width() - (borderSize()*2);
         const int height = maximized ? borderTop() : borderTop() - borderSize();
@@ -291,7 +292,7 @@ namespace Breeze
         if( m_internalSettings->animationsEnabled() )
         {
 
-            auto c = client().data();
+            auto c = decorationClient(this);
             m_animation->setDirection( c->isActive() ? QPropertyAnimation::Forward : QPropertyAnimation::Backward );
             if( m_animation->state() != QPropertyAnimation::Running ) m_animation->start();
 
@@ -305,7 +306,7 @@ namespace Breeze
     //________________________________________________________________
     void Decoration::updateSizeGripVisibility()
     {
-        auto c = client().data();
+        auto c = decorationClient(this);
         if( m_sizeGrip )
         { m_sizeGrip->setVisible( c->isResizeable() && !isMaximized() && !c->isShaded() ); }
     }
@@ -372,7 +373,7 @@ namespace Breeze
     //________________________________________________________________
     void Decoration::recalculateBorders()
     {
-        auto c = client().data();
+        auto c = decorationClient(this);
         auto s = settings();
 
         // left, right and bottom borders
@@ -465,7 +466,7 @@ namespace Breeze
     void Decoration::paint(QPainter *painter, const QRect &repaintRegion)
     {
         // TODO: optimize based on repaintRegion
-        auto c = client().data();
+        auto c = decorationClient(this);
         auto s = settings();
 
         const bool maximized = isMaximized();
@@ -515,7 +516,7 @@ namespace Breeze
     //________________________________________________________________
     void Decoration::paintTitleBar(QPainter *painter, const QRect &repaintRegion)
     {
-        const auto c = client().data();
+        const auto c = decorationClient(this);
         const bool maximized = isMaximized();
         const QRect titleRect(QPoint(borderLeft(), maximized ? 0 : borderSize()), QSize(size().width() - borderLeft() - borderRight(), buttonHeight()));
 
@@ -587,7 +588,7 @@ namespace Breeze
         if( hideTitleBar() ) return qMakePair( QRect(), Qt::AlignCenter );
         else {
 
-            auto c = client().data();
+            auto c = decorationClient(this);
             int leftOffset = m_leftButtons->buttons().isEmpty() ?
                 4.0*settings()->smallSpacing():
                 m_leftButtons->geometry().x() + m_leftButtons->geometry().width() + 4.0*settings()->smallSpacing();
@@ -735,7 +736,7 @@ namespace Breeze
         if( !QX11Info::isPlatformX11() ) return;
 
         // access client
-        auto c = client().data();
+        auto c = decorationClient(this);
         if( !c ) return;
 
         if( c->windowId() != 0 )

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "breezebutton.h"
+#include "breezecompat.h"
 
 #include <KDecoration2/DecoratedClient>
 #include <KColorUtils>
@@ -54,7 +55,8 @@ namespace Breeze
         setIconSize(QSize( width, height ));
 
         // connections
-        connect(decoration->client().data(), SIGNAL(iconChanged(QIcon)), this, SLOT(update()));
+        connect(decorationClient(decoration), &KDecoration2::DecoratedClient::iconChanged,
+                this, qOverload<>(&Button::update));
         connect(decoration->settings().data(), &KDecoration2::DecorationSettings::reconfigured, this, &Button::reconfigure);
         connect( this, &KDecoration2::DecorationButton::hoveredChanged, this, &Button::updateAnimationState );
 
@@ -82,32 +84,32 @@ namespace Breeze
             {
 
                 case DecorationButtonType::Close:
-                b->setVisible( d->client().data()->isCloseable() );
-                QObject::connect(d->client().data(), &KDecoration2::DecoratedClient::closeableChanged, b, &Breeze::Button::setVisible );
+                b->setVisible( decorationClient(d)->isCloseable() );
+                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::closeableChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::Maximize:
-                b->setVisible( d->client().data()->isMaximizeable() );
-                QObject::connect(d->client().data(), &KDecoration2::DecoratedClient::maximizeableChanged, b, &Breeze::Button::setVisible );
+                b->setVisible( decorationClient(d)->isMaximizeable() );
+                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::maximizeableChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::Minimize:
-                b->setVisible( d->client().data()->isMinimizeable() );
-                QObject::connect(d->client().data(), &KDecoration2::DecoratedClient::minimizeableChanged, b, &Breeze::Button::setVisible );
+                b->setVisible( decorationClient(d)->isMinimizeable() );
+                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::minimizeableChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::ContextHelp:
-                b->setVisible( d->client().data()->providesContextHelp() );
-                QObject::connect(d->client().data(), &KDecoration2::DecoratedClient::providesContextHelpChanged, b, &Breeze::Button::setVisible );
+                b->setVisible( decorationClient(d)->providesContextHelp() );
+                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::providesContextHelpChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::Shade:
-                b->setVisible( d->client().data()->isShadeable() );
-                QObject::connect(d->client().data(), &KDecoration2::DecoratedClient::shadeableChanged, b, &Breeze::Button::setVisible );
+                b->setVisible( decorationClient(d)->isShadeable() );
+                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::shadeableChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::Menu:
-                QObject::connect(d->client().data(), &KDecoration2::DecoratedClient::iconChanged, b, [b]() { b->update(); });
+                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::iconChanged, b, [b]() { b->update(); });
                 break;
 
                 default: break;
@@ -145,7 +147,7 @@ namespace Breeze
             const qreal topLeft = (geometry().width()/2) - (menuIconSize/2);
 
             const QRectF iconRect(topLeft + geometry().left(), topLeft + geometry().top(), menuIconSize, menuIconSize);
-            decoration()->client().data()->icon().paint(painter, iconRect.toRect());
+            decorationClient(decoration())->icon().paint(painter, iconRect.toRect());
 
         } else {
 
@@ -179,7 +181,7 @@ namespace Breeze
         const QColor backgroundColor( this->backgroundColor() );
 
         auto d = qobject_cast<Decoration*>( decoration() );
-        bool isInactive(d && !d->client().data()->isActive()
+        bool isInactive(d && !decorationClient(d)->isActive()
                         && !isHovered() && !isPressed()
                         && m_animation->state() != QPropertyAnimation::Running);
         QColor inactiveCol(Qt::gray);
