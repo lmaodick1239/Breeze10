@@ -1,29 +1,20 @@
-################# dependencies #################
+find_package(Qt6 REQUIRED CONFIG COMPONENTS Widgets)
 
-### Qt/KDE
-find_package(Qt5 REQUIRED CONFIG COMPONENTS Widgets)
+configure_file(config-breezecommon.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-breezecommon.h)
 
-################# configuration #################
-configure_file(config-breezecommon.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-breezecommon.h )
-
-################# breezestyle target #################
 set(breeze10common_LIB_SRCS
-    breezeboxshadowrenderer.cpp
-)
+    breezeboxshadowrenderer.cpp)
 
-add_library(breeze10common5 ${breeze10common_LIB_SRCS})
-
-generate_export_header(breeze10common5
+add_library(breeze10common6 ${breeze10common_LIB_SRCS})
+generate_export_header(breeze10common6
     BASE_NAME breezecommon
     EXPORT_FILE_NAME breezecommon_export.h)
 
-target_link_libraries(breeze10common5
-    PUBLIC
-        Qt5::Core
-        Qt5::Gui)
+target_link_libraries(breeze10common6
+    PUBLIC Qt6::Core Qt6::Gui)
 
-set_target_properties(breeze10common5 PROPERTIES
+set_target_properties(breeze10common6 PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR})
 
-install(TARGETS breeze10common5 ${INSTALL_TARGETS_DEFAULT_ARGS} LIBRARY NAMELINK_SKIP)
+install(TARGETS breeze10common6 ${INSTALL_TARGETS_DEFAULT_ARGS} LIBRARY NAMELINK_SKIP)

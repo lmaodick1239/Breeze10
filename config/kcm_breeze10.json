@@ -1,0 +1,10 @@
+{
+    "KPlugin": {
+        "Name": "Breeze10",
+        "Description": "Configure the Breeze10 window decoration",
+        "Id": "kcm_breeze10",
+        "ServiceTypes": [
+            "KCModule"
+        ]
+    }
+}
