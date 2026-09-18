@@ -2,15 +2,23 @@
 
 #if BREEZE_HAVE_X11
 
+#include <QGuiApplication>
+#include <QtGui/qnativeinterface.h>
+#include <X11/Xlib.h>
+
 namespace Breeze
 {
 
-xcb_window_t breezeX11RootWindow(xcb_connection_t *connection, int defaultScreen)
+xcb_window_t breezeX11RootWindow()
 {
-    if (!connection || defaultScreen < 0) return XCB_WINDOW_NONE;
+    if (!qGuiApp) return XCB_WINDOW_NONE;
 
-    const xcb_setup_t *setup = xcb_get_setup(connection);
-    if (!setup) return XCB_WINDOW_NONE;
+    const auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+    if (!x11 || !x11->display() || !x11->connection()) return XCB_WINDOW_NONE;
+
+    const int defaultScreen = DefaultScreen(x11->display());
+    const xcb_setup_t *setup = xcb_get_setup(x11->connection());
+    if (!setup || defaultScreen < 0) return XCB_WINDOW_NONE;
 
     xcb_screen_iterator_t screens = xcb_setup_roots_iterator(setup);
     for (int index = 0; screens.rem && screens.data; ++index, xcb_screen_next(&screens)) {
