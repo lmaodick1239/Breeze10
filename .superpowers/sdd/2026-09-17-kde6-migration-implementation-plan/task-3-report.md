@@ -39,4 +39,3 @@
   - Build/CMake success was not claimed because KF6/KDecoration packages are unavailable.
 - covering checks: `breezex11.h/.cpp`, `breezesizegrip.cpp`, `config/breezedetectwidget.cpp`, `breezedecoration.cpp`, and `config/breezeexceptiondialog.cpp` were checked for X11/non-X11 guards and helper/native-interface usage; the latter two retain their existing safe X11 gating and do not call the root helper.
 - concerns: exact Qt/KF6 compilation, multi-screen X11 runtime behavior, synthetic release, `_NET_WM_MOVERESIZE`, and Wayland/no-XCB runtime behavior remain unverified because required development packages and an X11 test environment are unavailable.
-
