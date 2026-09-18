@@ -1,5 +1,7 @@
 Latest version:
 
-	18 Jun 2019, V5.16
+	2026, KDE6 port
+
+Breeze10 now targets Plasma 6, KF6, and Qt 6 only. The window decoration and its settings are installed as separate Plasma 6 plugins. X11 detection and the size grip remain optional XCB features; their native X11 paths are skipped on Wayland.
 
 See "ChangeLog" for changes.

@@ -1,3 +1,7 @@
-V5.16
+KDE6 port
 ---------
- * Initial release.
+ * Ported Breeze10 to Plasma 6, KF6, and Qt 6.
+ * Split the window decoration and configuration module into separate plugins.
+ * Retained X11-only window detection and size-grip behavior when optional XCB support is available.
+ * Wayland safely skips X11-only paths.
+ * KDE5/Qt5 is no longer supported.

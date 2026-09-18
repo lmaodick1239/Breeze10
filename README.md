@@ -13,41 +13,29 @@ Breeze10 is a fork of KDE Breeze decoration with the following changes:
 
 Breeze10 was started from BreezeEnhanced (https://github.com/tsujan/BreezeEnhanced), a former fork of Breeze with title-bar translucency and blurring.
 
-## Dependencies
+## Compatibility
 
-There are some dependencies you'll need to install. Some people suggested using the following commands:
+Breeze10 targets Plasma 6 and KF6 with Qt 6. Plasma 5, KDE Frameworks 5, and Qt 5 are not supported.
 
-### Ubuntu, KDE Neon
-``` shell
-sudo apt install git g++ extra-cmake-modules cmake gettext libkf5config-dev libkdecorations2-dev libqt5x11extras5-dev qtdeclarative5-dev libkf5guiaddons-dev libkf5configwidgets-dev libkf5windowsystem-dev libkf5coreaddons-dev libfftw3-dev
-```
-
-### Arch Linux, Manjaro, Antergos
-``` shell
-sudo pacman -S kdecoration qt5-declarative qt5-x11extras kcoreaddons kguiaddons kconfigwidgets kwindowsystem fftw cmake extra-cmake-modules
-```
-
-### OpenSUSE
-``` shell
-sudo zypper install git extra-cmake-modules libkdecoration2-devel kcoreaddons-devel kguiaddons-devel kconfig-devel kwindowsystem-devel ki18n-devel kconfigwidgets-devel libQt5DBus-devel libqt5-qtx11extras-devel fftw3-devel
-```
+The build requires CMake, Extra CMake Modules, Qt 6, KF6 components (including KConfig, KConfigWidgets, KCoreAddons, KGuiAddons, KWindowSystem, KI18n, KIconThemes, and KCMUtils), and the Plasma 6 KDecoration development package. XCB is optional and enables the X11-only native window features.
 
 ## Installation
 
-The version number in the file NEWS shows the main version of KWin that is required for the compilation. *Compilation should not be done against other versions of KWin!*.
+Configure, build, and install from the source directory:
 
-Open a terminal inside the source directory and do:
 ```sh
-mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DKDE_INSTALL_LIBDIR=lib -DBUILD_TESTING=OFF -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
-make
-sudo make install
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+cmake --build build --parallel
+sudo cmake --install build
 ```
-After the intallation, restart KWin by logging out and in. Then, Breeze10 will appear in *System Settings &rarr; Application Style &rarr; Window Decorations*.
+
+Breeze10 is installed as a Plasma 6 window-decoration plugin. Its configuration module is a separate KCM plugin and appears in *System Settings -> Application Style -> Window Decorations* after KWin is restarted or the session is reloaded.
+
+X11 window detection and the size-grip XCB operations are available only when XCB is found and the application is running with a native X11 interface. On Wayland, those paths are skipped and the detection control is unavailable.
 
 ## Known Issues
 
-None so far.
+The KDE6 port has not been runtime-tested in this environment because the required KF6 and KDecoration development packages are unavailable.
 
 ## Screenshots
 

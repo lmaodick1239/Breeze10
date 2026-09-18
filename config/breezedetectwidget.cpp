@@ -116,7 +116,6 @@ namespace Breeze
         m_grabber->setModal( true );
         m_grabber->show();
 
-        // need to explicitly override cursor for Qt5
         qApp->setOverrideCursor( Qt::CrossCursor );
         m_grabber->grabMouse( Qt::CrossCursor );
         m_grabber->installEventFilter( this );
@@ -130,7 +129,6 @@ namespace Breeze
         if( o != m_grabber ) return false;
         if( e->type() != QEvent::MouseButtonRelease ) return false;
 
-        // need to explicitely release cursor for Qt5
         qApp->restoreOverrideCursor();
 
         // delete old m_grabber
