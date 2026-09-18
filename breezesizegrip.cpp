@@ -274,7 +274,7 @@ namespace Breeze
         releaseEvent.response_type = XCB_BUTTON_RELEASE;
         releaseEvent.event =  winId();
         releaseEvent.child = XCB_WINDOW_NONE;
-        releaseEvent.root = breezeX11RootWindow(connection);
+        releaseEvent.root = breezeX11RootWindow(connection, x11->screen());
         if (releaseEvent.root == XCB_WINDOW_NONE) return;
         releaseEvent.event_x = position.x();
         releaseEvent.event_y = position.y();

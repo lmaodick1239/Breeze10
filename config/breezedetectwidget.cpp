@@ -158,7 +158,7 @@ namespace Breeze
         if (!m_wmStateAtom) return 0;
 
         xcb_connection_t *connection = x11->connection();
-        xcb_window_t parent = breezeX11RootWindow(connection);
+        xcb_window_t parent = breezeX11RootWindow(connection, x11->screen());
         if (parent == XCB_WINDOW_NONE) return 0;
 
         // why is there a loop of only 10 here

@@ -9,7 +9,7 @@
 namespace Breeze
 {
 
-xcb_window_t breezeX11RootWindow(xcb_connection_t *connection);
+xcb_window_t breezeX11RootWindow(xcb_connection_t *connection, int defaultScreen);
 
 }
 #endif

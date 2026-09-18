@@ -5,17 +5,19 @@
 namespace Breeze
 {
 
-xcb_window_t breezeX11RootWindow(xcb_connection_t *connection)
+xcb_window_t breezeX11RootWindow(xcb_connection_t *connection, int defaultScreen)
 {
-    if (!connection) return XCB_WINDOW_NONE;
+    if (!connection || defaultScreen < 0) return XCB_WINDOW_NONE;
 
     const xcb_setup_t *setup = xcb_get_setup(connection);
     if (!setup) return XCB_WINDOW_NONE;
 
     xcb_screen_iterator_t screens = xcb_setup_roots_iterator(setup);
-    if (!screens.data) return XCB_WINDOW_NONE;
+    for (int index = 0; screens.rem && screens.data; ++index, xcb_screen_next(&screens)) {
+        if (index == defaultScreen) return screens.data->root;
+    }
 
-    return screens.data->root;
+    return XCB_WINDOW_NONE;
 }
 
 }
