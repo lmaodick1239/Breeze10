@@ -21,7 +21,6 @@
 #include "breezebutton.h"
 #include "breezecompat.h"
 
-#include <KDecoration2/DecoratedClient>
 #include <KColorUtils>
 
 #include <QPainter>
@@ -30,14 +29,14 @@
 namespace Breeze
 {
 
-    using KDecoration2::ColorRole;
-    using KDecoration2::ColorGroup;
-    using KDecoration2::DecorationButtonType;
+    using ColorRole = ColorRoleApi;
+    using ColorGroup = ColorGroupApi;
+    using DecorationButtonType = DecorationButtonTypeApi;
 
 
     //__________________________________________________________________
     Button::Button(DecorationButtonType type, Decoration* decoration, QObject* parent)
-        : DecorationButton(type, decoration, parent)
+        : DecorationButtonApi(type, decoration, parent)
         , m_animation( new QPropertyAnimation( this ) )
     {
 
@@ -55,10 +54,10 @@ namespace Breeze
         setIconSize(QSize( width, height ));
 
         // connections
-        connect(decorationClient(decoration), &KDecoration2::DecoratedClient::iconChanged,
+        connect(decorationClient(decoration), &DecoratedClientApi::iconChanged,
                 this, qOverload<>(&Button::update));
-        connect(decoration->settings().data(), &KDecoration2::DecorationSettings::reconfigured, this, &Button::reconfigure);
-        connect( this, &KDecoration2::DecorationButton::hoveredChanged, this, &Button::updateAnimationState );
+        connect(decoration->settings().data(), &DecorationSettingsApi::reconfigured, this, &Button::reconfigure);
+        connect( this, &DecorationButtonApi::hoveredChanged, this, &Button::updateAnimationState );
 
         reconfigure();
 
@@ -75,7 +74,7 @@ namespace Breeze
     }
             
     //__________________________________________________________________
-    Button *Button::create(DecorationButtonType type, KDecoration2::Decoration *decoration, QObject *parent)
+    Button *Button::create(DecorationButtonType type, DecorationApi *decoration, QObject *parent)
     {
         if (auto d = qobject_cast<Decoration*>(decoration))
         {
@@ -85,31 +84,31 @@ namespace Breeze
 
                 case DecorationButtonType::Close:
                 b->setVisible( decorationClient(d)->isCloseable() );
-                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::closeableChanged, b, &Breeze::Button::setVisible );
+                QObject::connect(decorationClient(d), &DecoratedClientApi::closeableChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::Maximize:
                 b->setVisible( decorationClient(d)->isMaximizeable() );
-                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::maximizeableChanged, b, &Breeze::Button::setVisible );
+                QObject::connect(decorationClient(d), &DecoratedClientApi::maximizeableChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::Minimize:
                 b->setVisible( decorationClient(d)->isMinimizeable() );
-                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::minimizeableChanged, b, &Breeze::Button::setVisible );
+                QObject::connect(decorationClient(d), &DecoratedClientApi::minimizeableChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::ContextHelp:
                 b->setVisible( decorationClient(d)->providesContextHelp() );
-                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::providesContextHelpChanged, b, &Breeze::Button::setVisible );
+                QObject::connect(decorationClient(d), &DecoratedClientApi::providesContextHelpChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::Shade:
                 b->setVisible( decorationClient(d)->isShadeable() );
-                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::shadeableChanged, b, &Breeze::Button::setVisible );
+                QObject::connect(decorationClient(d), &DecoratedClientApi::shadeableChanged, b, &Breeze::Button::setVisible );
                 break;
 
                 case DecorationButtonType::Menu:
-                QObject::connect(decorationClient(d), &KDecoration2::DecoratedClient::iconChanged, b, [b]() { b->update(); });
+                QObject::connect(decorationClient(d), &DecoratedClientApi::iconChanged, b, [b]() { b->update(); });
                 break;
 
                 default: break;

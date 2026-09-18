@@ -30,10 +30,6 @@
 
 #include "breezeboxshadowrenderer.h"
 
-#include <KDecoration2/DecoratedClient>
-#include <KDecoration2/DecorationButtonGroup>
-#include <KDecoration2/DecorationSettings>
-#include <KDecoration2/DecorationShadow>
 
 #include <KConfigGroup>
 #include <KColorUtils>
@@ -143,20 +139,20 @@ namespace
 namespace Breeze
 {
 
-    using KDecoration2::ColorRole;
-    using KDecoration2::ColorGroup;
-    using KDecoration2::DecorationButtonType;
+    using ColorRole = ColorRoleApi;
+    using ColorGroup = ColorGroupApi;
+    using DecorationButtonType = DecorationButtonTypeApi;
 
     //________________________________________________________________
     static int g_sDecoCount = 0;
     static int g_shadowSizeEnum = InternalSettings::ShadowLarge;
     static int g_shadowStrength = 255;
     static QColor g_shadowColor = Qt::black;
-    static QSharedPointer<KDecoration2::DecorationShadow> g_sShadow;
+    static QSharedPointer<DecorationShadowApi> g_sShadow;
 
     //________________________________________________________________
     Decoration::Decoration(QObject *parent, const QVariantList &args)
-        : KDecoration2::Decoration(parent, args)
+        : DecorationApi(parent, args)
         , m_animation( new QPropertyAnimation( this ) )
     {
         g_sDecoCount++;
@@ -231,27 +227,27 @@ namespace Breeze
         reconfigure();
         updateTitleBar();
         auto s = settings();
-        connect(s.data(), &KDecoration2::DecorationSettings::borderSizeChanged, this, &Decoration::recalculateBorders);
+        connect(s.data(), &DecorationSettingsApi::borderSizeChanged, this, &Decoration::recalculateBorders);
 
         // a change in font might cause the borders to change
         recalculateBorders();
-        connect(s.data(), &KDecoration2::DecorationSettings::spacingChanged, this, &Decoration::recalculateBorders);
+        connect(s.data(), &DecorationSettingsApi::spacingChanged, this, &Decoration::recalculateBorders);
 
         // buttons
-        connect(s.data(), &KDecoration2::DecorationSettings::spacingChanged, this, &Decoration::updateButtonsGeometryDelayed);
-        connect(s.data(), &KDecoration2::DecorationSettings::decorationButtonsLeftChanged, this, &Decoration::updateButtonsGeometryDelayed);
-        connect(s.data(), &KDecoration2::DecorationSettings::decorationButtonsRightChanged, this, &Decoration::updateButtonsGeometryDelayed);
+        connect(s.data(), &DecorationSettingsApi::spacingChanged, this, &Decoration::updateButtonsGeometryDelayed);
+        connect(s.data(), &DecorationSettingsApi::decorationButtonsLeftChanged, this, &Decoration::updateButtonsGeometryDelayed);
+        connect(s.data(), &DecorationSettingsApi::decorationButtonsRightChanged, this, &Decoration::updateButtonsGeometryDelayed);
 
         // full reconfiguration
-        connect(s.data(), &KDecoration2::DecorationSettings::reconfigured, this, &Decoration::reconfigure);
-        connect(s.data(), &KDecoration2::DecorationSettings::reconfigured, SettingsProvider::self(), &SettingsProvider::reconfigure, Qt::UniqueConnection );
-        connect(s.data(), &KDecoration2::DecorationSettings::reconfigured, this, &Decoration::updateButtonsGeometryDelayed);
+        connect(s.data(), &DecorationSettingsApi::reconfigured, this, &Decoration::reconfigure);
+        connect(s.data(), &DecorationSettingsApi::reconfigured, SettingsProvider::self(), &SettingsProvider::reconfigure, Qt::UniqueConnection );
+        connect(s.data(), &DecorationSettingsApi::reconfigured, this, &Decoration::updateButtonsGeometryDelayed);
 
-        connect(c, &KDecoration2::DecoratedClient::adjacentScreenEdgesChanged, this, &Decoration::recalculateBorders);
-        connect(c, &KDecoration2::DecoratedClient::maximizedHorizontallyChanged, this, &Decoration::recalculateBorders);
-        connect(c, &KDecoration2::DecoratedClient::maximizedVerticallyChanged, this, &Decoration::recalculateBorders);
-        connect(c, &KDecoration2::DecoratedClient::shadedChanged, this, &Decoration::recalculateBorders);
-        connect(c, &KDecoration2::DecoratedClient::captionChanged, this,
+        connect(c, &DecoratedClientApi::adjacentScreenEdgesChanged, this, &Decoration::recalculateBorders);
+        connect(c, &DecoratedClientApi::maximizedHorizontallyChanged, this, &Decoration::recalculateBorders);
+        connect(c, &DecoratedClientApi::maximizedVerticallyChanged, this, &Decoration::recalculateBorders);
+        connect(c, &DecoratedClientApi::shadedChanged, this, &Decoration::recalculateBorders);
+        connect(c, &DecoratedClientApi::captionChanged, this,
             [this]()
             {
                 // update the caption area
@@ -259,15 +255,15 @@ namespace Breeze
             }
         );
 
-        connect(c, &KDecoration2::DecoratedClient::activeChanged, this, &Decoration::updateAnimationState);
-        connect(c, &KDecoration2::DecoratedClient::widthChanged, this, &Decoration::updateTitleBar);
-        connect(c, &KDecoration2::DecoratedClient::maximizedChanged, this, &Decoration::updateTitleBar);
-        //connect(c, &KDecoration2::DecoratedClient::maximizedChanged, this, &Decoration::setOpaque);
+        connect(c, &DecoratedClientApi::activeChanged, this, &Decoration::updateAnimationState);
+        connect(c, &DecoratedClientApi::widthChanged, this, &Decoration::updateTitleBar);
+        connect(c, &DecoratedClientApi::maximizedChanged, this, &Decoration::updateTitleBar);
+        //connect(c, &DecoratedClientApi::maximizedChanged, this, &Decoration::setOpaque);
 
-        connect(c, &KDecoration2::DecoratedClient::widthChanged, this, &Decoration::updateButtonsGeometry);
-        connect(c, &KDecoration2::DecoratedClient::maximizedChanged, this, &Decoration::updateButtonsGeometry);
-        connect(c, &KDecoration2::DecoratedClient::adjacentScreenEdgesChanged, this, &Decoration::updateButtonsGeometry);
-        connect(c, &KDecoration2::DecoratedClient::shadedChanged, this, &Decoration::updateButtonsGeometry);
+        connect(c, &DecoratedClientApi::widthChanged, this, &Decoration::updateButtonsGeometry);
+        connect(c, &DecoratedClientApi::maximizedChanged, this, &Decoration::updateButtonsGeometry);
+        connect(c, &DecoratedClientApi::adjacentScreenEdgesChanged, this, &Decoration::updateButtonsGeometry);
+        connect(c, &DecoratedClientApi::shadedChanged, this, &Decoration::updateButtonsGeometry);
 
         createButtons();
         createShadow();
@@ -333,16 +329,16 @@ namespace Breeze
         } else {
 
             switch (settings()->borderSize()) {
-                case KDecoration2::BorderSize::None: return 0;
-                case KDecoration2::BorderSize::NoSides: return bottom ? qMax(4, baseSize) : 0;
+                case BorderSizeApi::None: return 0;
+                case BorderSizeApi::NoSides: return bottom ? qMax(4, baseSize) : 0;
                 default:
-                case KDecoration2::BorderSize::Tiny: return baseSize/2;
-                case KDecoration2::BorderSize::Normal: return baseSize;
-                case KDecoration2::BorderSize::Large: return baseSize*2;
-                case KDecoration2::BorderSize::VeryLarge: return baseSize*3;
-                case KDecoration2::BorderSize::Huge: return baseSize*4;
-                case KDecoration2::BorderSize::VeryHuge: return baseSize*5;
-                case KDecoration2::BorderSize::Oversized: return baseSize*8;
+                case BorderSizeApi::Tiny: return baseSize/2;
+                case BorderSizeApi::Normal: return baseSize;
+                case BorderSizeApi::Large: return baseSize*2;
+                case BorderSizeApi::VeryLarge: return baseSize*3;
+                case BorderSizeApi::Huge: return baseSize*4;
+                case BorderSizeApi::VeryHuge: return baseSize*5;
+                case BorderSizeApi::Oversized: return baseSize*8;
 
             }
 
@@ -412,8 +408,8 @@ namespace Breeze
     //________________________________________________________________
     void Decoration::createButtons()
     {
-        m_leftButtons = new KDecoration2::DecorationButtonGroup(KDecoration2::DecorationButtonGroup::Position::Left, this, &Button::create);
-        m_rightButtons = new KDecoration2::DecorationButtonGroup(KDecoration2::DecorationButtonGroup::Position::Right, this, &Button::create);
+        m_leftButtons = new DecorationButtonGroupApi(DecorationButtonGroupApi::Position::Left, this, &Button::create);
+        m_rightButtons = new DecorationButtonGroupApi(DecorationButtonGroupApi::Position::Right, this, &Button::create);
         updateButtonsGeometry();
     }
 
@@ -428,7 +424,7 @@ namespace Breeze
 
         // adjust button position
         const int bHeight = buttonHeight();
-        foreach( const QPointer<KDecoration2::DecorationButton>& button, m_leftButtons->buttons() + m_rightButtons->buttons() )
+        foreach( const QPointer<DecorationButtonApi>& button, m_leftButtons->buttons() + m_rightButtons->buttons() )
         {
             const int bWidth = buttonHeight() * (button.data()->type() == DecorationButtonType::Menu ? 1.0 : 1.5);
             button.data()->setGeometry( QRectF( QPoint( 0, 0 ), QSizeF( bWidth, bHeight ) ) );
@@ -716,7 +712,7 @@ namespace Breeze
 
             painter.end();
 
-            g_sShadow = QSharedPointer<KDecoration2::DecorationShadow>::create();
+            g_sShadow = QSharedPointer<DecorationShadowApi>::create();
             g_sShadow->setPadding(padding);
             g_sShadow->setInnerShadowRect(QRect(outerRect.center(), QSize(1, 1)));
             g_sShadow->setShadow(shadowTexture);
@@ -742,9 +738,9 @@ namespace Breeze
         if( c->windowId() != 0 )
         {
             m_sizeGrip = new SizeGrip( this );
-            connect( c, &KDecoration2::DecoratedClient::maximizedChanged, this, &Decoration::updateSizeGripVisibility );
-            connect( c, &KDecoration2::DecoratedClient::shadedChanged, this, &Decoration::updateSizeGripVisibility );
-            connect( c, &KDecoration2::DecoratedClient::resizeableChanged, this, &Decoration::updateSizeGripVisibility );
+            connect( c, &DecoratedClientApi::maximizedChanged, this, &Decoration::updateSizeGripVisibility );
+            connect( c, &DecoratedClientApi::shadedChanged, this, &Decoration::updateSizeGripVisibility );
+            connect( c, &DecoratedClientApi::resizeableChanged, this, &Decoration::updateSizeGripVisibility );
         }
         #endif
 

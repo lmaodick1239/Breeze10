@@ -22,7 +22,6 @@
 
 #include "breezecompat.h"
 
-#include <KDecoration2/DecoratedClient>
 
 #include <QPainter>
 #include <QPolygon>
@@ -65,9 +64,9 @@ namespace Breeze
 
         // connections
         auto c = decorationClient(decoration);
-        connect( c, &KDecoration2::DecoratedClient::widthChanged, this, &SizeGrip::updatePosition );
-        connect( c, &KDecoration2::DecoratedClient::heightChanged, this, &SizeGrip::updatePosition );
-        connect( c, &KDecoration2::DecoratedClient::activeChanged, this, &SizeGrip::updateActiveState );
+        connect( c, &DecoratedClientApi::widthChanged, this, &SizeGrip::updatePosition );
+        connect( c, &DecoratedClientApi::heightChanged, this, &SizeGrip::updatePosition );
+        connect( c, &DecoratedClientApi::activeChanged, this, &SizeGrip::updateActiveState );
 
         // show
         show();

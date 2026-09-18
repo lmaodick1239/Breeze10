@@ -26,24 +26,15 @@
 #include "breezecompat.h"
 #include "breezesettings.h"
 
-#include <KDecoration2/Decoration>
-#include <KDecoration2/DecoratedClient>
-#include <KDecoration2/DecorationSettings>
 
 #include <QPalette>
 #include <QPropertyAnimation>
 #include <QVariant>
 
-namespace KDecoration2
-{
-    class DecorationButton;
-    class DecorationButtonGroup;
-}
-
 namespace Breeze
 {
     class SizeGrip;
-    class Decoration : public KDecoration2::Decoration
+    class Decoration : public DecorationApi
     {
         Q_OBJECT
 
@@ -148,8 +139,8 @@ namespace Breeze
         //@}
 
         InternalSettingsPtr m_internalSettings;
-        KDecoration2::DecorationButtonGroup *m_leftButtons = nullptr;
-        KDecoration2::DecorationButtonGroup *m_rightButtons = nullptr;
+        DecorationButtonGroupApi *m_leftButtons = nullptr;
+        DecorationButtonGroupApi *m_rightButtons = nullptr;
 
         //* size grip widget
         SizeGrip *m_sizeGrip = nullptr;
@@ -165,19 +156,19 @@ namespace Breeze
     bool Decoration::hasBorders() const
     {
         if( m_internalSettings && m_internalSettings->mask() & BorderSize ) return m_internalSettings->borderSize() > InternalSettings::BorderNoSides;
-        else return settings()->borderSize() > KDecoration2::BorderSize::NoSides;
+        else return settings()->borderSize() > BorderSizeApi::NoSides;
     }
 
     bool Decoration::hasNoBorders() const
     {
         if( m_internalSettings && m_internalSettings->mask() & BorderSize ) return m_internalSettings->borderSize() == InternalSettings::BorderNone;
-        else return settings()->borderSize() == KDecoration2::BorderSize::None;
+        else return settings()->borderSize() == BorderSizeApi::None;
     }
 
     bool Decoration::hasNoSideBorders() const
     {
         if( m_internalSettings && m_internalSettings->mask() & BorderSize ) return m_internalSettings->borderSize() == InternalSettings::BorderNoSides;
-        else return settings()->borderSize() == KDecoration2::BorderSize::NoSides;
+        else return settings()->borderSize() == BorderSizeApi::NoSides;
     }
 
     bool Decoration::isMaximized() const
