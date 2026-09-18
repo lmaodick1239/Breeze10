@@ -30,14 +30,15 @@
 #include "breezedetectwidget.h"
 
 #include "breeze.h"
+#include "../breezex11.h"
 
 #include <KWindowInfo>
 
+#include <QGuiApplication>
 #include <QPushButton>
 #include <QMouseEvent>
 #include <config-breeze.h>
 #if BREEZE_HAVE_X11
-#include <QX11Info>
 #include <xcb/xcb.h>
 #endif
 
@@ -56,9 +57,11 @@ namespace Breeze
         m_ui.windowClassCheckBox->setChecked( true );
 
 #if BREEZE_HAVE_X11
-        if (QX11Info::isPlatformX11()) {
+        if (qGuiApp) {
+            const auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+            if (!x11 || !x11->connection()) return;
             // create atom
-            xcb_connection_t* connection( QX11Info::connection() );
+            xcb_connection_t* connection = x11->connection();
             const QString atomName( QStringLiteral( "WM_STATE" ) );
             xcb_intern_atom_cookie_t cookie( xcb_intern_atom( connection, false, atomName.size(), qPrintable( atomName ) ) );
             QScopedPointer<xcb_intern_atom_reply_t, QScopedPointerPodDeleter> reply( xcb_intern_atom_reply( connection, cookie, nullptr) );
@@ -148,14 +151,15 @@ namespace Breeze
     {
 
         #if BREEZE_HAVE_X11
-        if (!QX11Info::isPlatformX11()) {
-            return 0;
-        }
+        if (!qGuiApp) return 0;
+        const auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+        if (!x11 || !x11->connection()) return 0;
         // check atom
-        if( !m_wmStateAtom ) return 0;
+        if (!m_wmStateAtom) return 0;
 
-        xcb_connection_t* connection( QX11Info::connection() );
-        xcb_window_t parent( QX11Info::appRootWindow() );
+        xcb_connection_t *connection = x11->connection();
+        xcb_window_t parent = breezeX11RootWindow(connection);
+        if (parent == XCB_WINDOW_NONE) return 0;
 
         // why is there a loop of only 10 here
         for( int i = 0; i < 10; ++i )

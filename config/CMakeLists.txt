@@ -6,7 +6,8 @@ set(breeze10_kcm_SRCS
     breezeexceptionmodel.cpp
     breezeitemmodel.cpp
     kcm_breeze10.cpp
-    ../breezeexceptionlist.cpp)
+    ../breezeexceptionlist.cpp
+    ../breezex11.cpp)
 
 set(breeze10_kcm_FORMS
     ui/breezeconfigurationui.ui

@@ -23,12 +23,13 @@
 #include "breezecompat.h"
 
 
+#include <QGuiApplication>
 #include <QPainter>
 #include <QPolygon>
 #include <QTimer>
 
 #if BREEZE_HAVE_X11
-#include <QX11Info>
+#include "breezex11.h"
 #endif
 
 namespace Breeze
@@ -81,12 +82,12 @@ namespace Breeze
     void SizeGrip::updateActiveState()
     {
         #if BREEZE_HAVE_X11
-        if( QX11Info::isPlatformX11() )
-        {
-            const quint32 value = XCB_STACK_MODE_ABOVE;
-            xcb_configure_window( QX11Info::connection(), winId(), XCB_CONFIG_WINDOW_STACK_MODE, &value );
-            xcb_map_window( QX11Info::connection(), winId() );
-        }
+        if (!qGuiApp) return;
+        const auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+        if (!x11 || !x11->connection()) return;
+        const quint32 value = XCB_STACK_MODE_ABOVE;
+        xcb_configure_window(x11->connection(), winId(), XCB_CONFIG_WINDOW_STACK_MODE, &value);
+        xcb_map_window(x11->connection(), winId());
         #endif
 
         update();
@@ -99,8 +100,11 @@ namespace Breeze
 
         #if BREEZE_HAVE_X11
 
-        if( !QX11Info::isPlatformX11() ) return;
+        if (!qGuiApp) return;
+        const auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+        if (!x11 || !x11->connection()) return;
         auto c = decorationClient(m_decoration.data());
+        if (!c) return;
 
         xcb_window_t windowId = c->windowId();
         if( windowId )
@@ -111,7 +115,7 @@ namespace Breeze
             we want the size grip to be at the same level as the client in the stack
             */
             xcb_window_t current = windowId;
-            auto connection = QX11Info::connection();
+            auto connection = x11->connection();
             xcb_query_tree_cookie_t cookie = xcb_query_tree_unchecked( connection, current );
             ScopedPointer<xcb_query_tree_reply_t> tree(xcb_query_tree_reply( connection, cookie, nullptr ) );
             if( !tree.isNull() && tree->parent ) current = tree->parent;
@@ -190,15 +194,18 @@ namespace Breeze
     {
 
         #if BREEZE_HAVE_X11
-        if( !QX11Info::isPlatformX11() ) return;
+        if (!qGuiApp) return;
+        const auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+        if (!x11 || !x11->connection()) return;
 
         auto c = decorationClient(m_decoration.data());
+        if (!c) return;
         QPoint position(
             c->width() - GripSize - Offset,
             c->height() - GripSize - Offset );
 
         quint32 values[2] = { quint32(position.x()), quint32(position.y()) };
-        xcb_configure_window( QX11Info::connection(), winId(), XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, values );
+        xcb_configure_window(x11->connection(), winId(), XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, values);
         #endif
 
     }
@@ -208,13 +215,16 @@ namespace Breeze
     {
 
         #if BREEZE_HAVE_X11
-        if( !QX11Info::isPlatformX11() ) return;
+        if (!qGuiApp) return;
+        const auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+        if (!x11 || !x11->connection()) return;
 
         // pointer to connection
-        auto connection( QX11Info::connection() );
+        auto connection = x11->connection();
 
         // client
         auto c = decorationClient(m_decoration.data());
+        if (!c) return;
 
         /*
         get root position matching position
@@ -264,7 +274,8 @@ namespace Breeze
         releaseEvent.response_type = XCB_BUTTON_RELEASE;
         releaseEvent.event =  winId();
         releaseEvent.child = XCB_WINDOW_NONE;
-        releaseEvent.root = QX11Info::appRootWindow();
+        releaseEvent.root = breezeX11RootWindow(connection);
+        if (releaseEvent.root == XCB_WINDOW_NONE) return;
         releaseEvent.event_x = position.x();
         releaseEvent.event_y = position.y();
         releaseEvent.root_x = rootPosition.x();
@@ -291,7 +302,7 @@ namespace Breeze
         clientMessageEvent.data.data32[3] = Qt::LeftButton;
         clientMessageEvent.data.data32[4] = 0;
 
-        xcb_send_event( connection, false, QX11Info::appRootWindow(),
+        xcb_send_event( connection, false, releaseEvent.root,
             XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
             XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
             reinterpret_cast<const char*>(&clientMessageEvent) );

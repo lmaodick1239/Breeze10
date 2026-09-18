@@ -27,6 +27,9 @@
 #include "config-breeze.h"
 #include "breezebutton.h"
 #include "breezesizegrip.h"
+#if BREEZE_HAVE_X11
+#include "breezex11.h"
+#endif
 
 #include "breezeboxshadowrenderer.h"
 
@@ -36,13 +39,10 @@
 #include <KSharedConfig>
 #include <KPluginFactory>
 
+#include <QGuiApplication>
 #include <QPainter>
 #include <QTextStream>
 #include <QTimer>
-
-#if BREEZE_HAVE_X11
-#include <QX11Info>
-#endif
 
 #include <cmath>
 
@@ -729,7 +729,9 @@ namespace Breeze
         if( m_sizeGrip ) return;
 
         #if BREEZE_HAVE_X11
-        if( !QX11Info::isPlatformX11() ) return;
+        if (!qGuiApp) return;
+        const auto *x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+        if (!x11 || !x11->connection()) return;
 
         // access client
         auto c = decorationClient(this);

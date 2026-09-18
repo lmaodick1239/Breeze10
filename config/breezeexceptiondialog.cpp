@@ -27,9 +27,7 @@
 #include "breezedetectwidget.h"
 #include "config-breeze.h"
 
-#if BREEZE_HAVE_X11
-#include <QX11Info>
-#endif
+#include <QGuiApplication>
 
 namespace Breeze
 {
@@ -65,7 +63,7 @@ namespace Breeze
 
         // hide detection dialog on non X11 platforms
         #if BREEZE_HAVE_X11
-        if( !QX11Info::isPlatformX11() ) m_ui.detectDialogButton->hide();
+        if (!qGuiApp || !qGuiApp->nativeInterface<QNativeInterface::QX11Application>()) m_ui.detectDialogButton->hide();
         #else
         m_ui.detectDialogButton->hide();
         #endif

@@ -63,7 +63,8 @@ set(breeze10_SRCS
     breezedecoration.cpp
     breezeexceptionlist.cpp
     breezesettingsprovider.cpp
-    breezesizegrip.cpp)
+    breezesizegrip.cpp
+    breezex11.cpp)
 kconfig_add_kcfg_files(breeze10_SRCS breezesettings.kcfgc)
 
 add_library(breeze10 MODULE ${breeze10_SRCS})
