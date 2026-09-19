@@ -12,7 +12,7 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(GenerateExportHeader)
-find_package(KF6 6.0 REQUIRED COMPONENTS CoreAddons GuiAddons ConfigWidgets WindowSystem I18n KCMUtils IconThemes ConfigGui)
+find_package(KF6 6.0 REQUIRED COMPONENTS CoreAddons GuiAddons ConfigWidgets WindowSystem I18n KCMUtils IconThemes Config)
 find_package(Qt6 CONFIG REQUIRED COMPONENTS Core Gui DBus Widgets)
 
 find_package(KDecoration2 6.0 CONFIG QUIET)
